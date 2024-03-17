@@ -17,14 +17,31 @@ def make_binary_txt_from_image(image_name : str,image_dir : str,save_name : str,
     # 컬러 이미지를 배열로 변환
     img_array = np.array(img)
 
-    # 특정 RGB 값을 정의 -> 흰색 = 길
-    # target_colors = [[249, 249, 249], [255, 255, 255]]
-    target_color = [[255, 255, 255]]
+    # 특정 RGB 값을 정의
+    # 흰 도보 추가
+    target_colors = [
+                    [255, 255, 255]
+                ]
+    # # 산길 추가
+    # for r in range(140,190):
+    #     for g in range(170,190):
+    #         for b in range(130,180):
+    #             target_colors.append([r,g,b])
+
+    # # 고가도로 추가
+    # for r in range(230,255):
+    #     for g in range(230,255):
+    #         for b in range(150,185):
+    #             target_colors.append([r,g,b])
     # 여러 타겟 색상에 대한 이진 배열을 초기화
     binary_array = np.zeros(img_array.shape[:2], dtype=int)
     # print(np.all(img_array == target_color, axis=-1))
     # 각 타겟 색상에 대해 이진 배열을 업데이트
-    binary_array = np.logical_or(binary_array, np.all(img_array == target_color, axis=-1)).astype(int)
+    for i in range(len(target_colors)):
+        # if i%(int(len(target_colors)/100))==0:
+        #     print(int((i/len(target_colors))*100),"완료")
+        target_color=target_colors[i]
+        binary_array = np.logical_or(binary_array, np.all(img_array == target_color, axis=-1)).astype(int)
     # print(binary_array)
     # binary_array 데이터를 텍스트 파일로 저장
     np.savetxt(f"{save_dir}/{save_name}", binary_array, fmt='%d', delimiter=' ')

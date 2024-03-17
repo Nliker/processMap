@@ -8,20 +8,20 @@ INF = 1e8
 
 
 # https://meticulousdev.tistory.com/entry/PYTHON-%ED%83%80%EC%9E%85-%ED%9E%8C%ED%8A%B8%EC%97%90%EC%84%9C-List%EC%99%80-list%EC%9D%98-%EC%B0%A8%EC%9D%B4
-def get_shortest_path(
+def get_short_path_by_astar(
     map: list[list[int]], start: tuple, end: tuple
 ) -> tuple[list, float]:
+    print("========ready for variables==========")
     h = len(map)
     w = len(map[0])
     heuristic_cost = [[INF] * w for _ in range(h)]
     total_cost_list = [[INF] * w for _ in range(h)]
     path_map = [[[0, 0]] * w for _ in range(h)]
-
     for i in range(h):
         for j in range(w):
             if map[i][j]:
                 heuristic_cost[i][j] = round(get_euclidean_distance((i, j), end), 3)
-
+    print("========ready for variables end==========")
     heap = []
     total_cost = 0
     heapq.heappush(
