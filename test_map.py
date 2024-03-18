@@ -25,14 +25,6 @@ def createFolder(directorys: list):
 
 
 if __name__ == "__main__":
-    # client = MongoClient(
-    #     f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}"
-    # )
-
-    # print(client.list_database_names())
-    # db = client.dunsan  # 연결 테스트를 위해 admin 데이터베이스 사용
-    # dunsanCollection = db.dunsan  # db 에서 collection 을 만든다.
-
     image_dir = f"{os.getcwd()}/maps"
     binary_dir = f"{os.getcwd()}/binarys"
     pathed_image_dir = f"{os.getcwd()}/pathed_maps"
@@ -111,17 +103,11 @@ if __name__ == "__main__":
         np.savetxt(f"{walkable_spot_dir}/walable_spot.txt", walkable_spot_np_list, fmt='%d', delimiter=' ')
     walkable_spot_list = [tuple(walkable_spot_np_list[i]) for i in range(walkable_spot_np_list.shape[0])]
 
-    # walkable_spot_list = [
-    #     (walkable_spot_tuple[0][i], walkable_spot_tuple[1][i])
-    #     for i in range(len(walkable_spot_tuple[0]))
-    # ]
-
     print(f"{len(walkable_spot_list)} walkable spot was detected")
 
     #start는 월평 가운데쪽
     start= walkable_spot_list[8839096]
     print(start)
-    # end= walkable_spot_list[8839098]
     end= walkable_spot_list[10537581]
     print(end)
 
@@ -131,33 +117,32 @@ if __name__ == "__main__":
     end_time = time.time()
     print(f"{end_time - start_time:.5f} sec")
     print(distance)
-    binary_image=Image.fromarray(binary_map.astype('uint8') * 255, 'L').convert("RGB")
+    if end:
+        binary_image=Image.fromarray(binary_map.astype('uint8') * 255, 'L').convert("RGB")
+        print(f"====================save pathed {file_name}===============================")
+        # 출발점에서 끝점까지 최단경로가 입혀진 이미지를 저장
+        for x,y in short_path:
+            binary_image.putpixel((y,x),(200,15,15))
+        binary_image.save(f"{pathed_image_dir}/{start[0]}_{start[1]}_to_{end[0]}_{end[1]}_pathed_map.png",'PNG')
 
-    print(f"====================save pathed {file_name}===============================")
-    # 이미지를 저장
-    for x,y in short_path:
-        binary_image.putpixel((y,x),(200,15,15))
-    binary_image.save(f"{pathed_image_dir}/{start[0]}_{start[1]}_to_{end[0]}_{end[1]}_pathed_map.png",'PNG')
+    #===============================update to db========================================
 
+    # client = MongoClient(
+    #     f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}"
+    # )
 
+    # print(client.list_database_names())
+    # db = client.dunsan  # 연결 테스트를 위해 admin 데이터베이스 사용
+    # dunsanCollection = db.dunsan  # db 에서 collection 을 만든다.
 
-        # short_path, distance = get_short_path_by_astar(binary_map, start, end)
+    # short_path, distance = get_short_path_by_astar(binary_map, start, end)
 
-        # post={
-        #     "start":start,
-        #     "end":end,
-        #     "path":short_path
-        # }
+    # post={
+    #     "start":start,
+    #     "end":end,
+    #     "path":short_path
+    # }
 
-        # post_id=dunsanCollection.insert_one(post).inserted_id
-        # print(dunsanCollection.find_one({"_id": post_id}))
-        # print(start,end)
-
-        # print(post_id)
-        # img = Image.open(f"{image_dir}/{file_name}")  # 이미지 경로 수정
-        # # 이미지가 RGB 모드인지 확인 후, 아니라면 변환
-        # if img.mode != "RGB":
-        #     img = img.convert("RGB")
-        # img_array = np.array(img)
-        # print(img.size)
-
+    # post_id=dunsanCollection.insert_one(post).inserted_id
+    # print(dunsanCollection.find_one({"_id": post_id}))
+    # print(start,end)
