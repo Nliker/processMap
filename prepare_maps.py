@@ -1,4 +1,7 @@
 import math
+import numpy as np
+import os
+import pickle
 
 idx_r = 0
 idx_c = 0
@@ -68,6 +71,7 @@ def mapping_gps(lat_0, lon_0):
 
 
 def get_coordinate_gps_mapping():
+    print("============loading coordinate_gps_map===========")
     x_min = 55941
     y_min = 25643
     x_max = 55975
@@ -75,4 +79,25 @@ def get_coordinate_gps_mapping():
     
     arr = [x_min, x_max, y_min, y_max]
     read_files(arr)
+    print("============loaded coordinate_gps_map===========")
     return latlng_map
+    
+
+def get_binary_map():
+    union_binary_map_dir=f"{os.getcwd()}/union_binary_map"
+    print("============loading union binary map===========")
+    binary_map = np.loadtxt(
+        f"{union_binary_map_dir}/union_binary_map.txt", delimiter=" ", dtype="int"
+    )
+    print(binary_map.shape)
+    print("============loaded union binary map===========")
+    return binary_map
+
+def get_shelter_index():
+    print("============loading shelter_index===========")
+    shelter_index_dir=f"{os.getcwd()}/shelter_index"
+    shelter_dict=None
+    with open(f"{shelter_index_dir}/shelter_index.pkl", 'rb') as f:
+        shelter_dict = pickle.load(f)
+    print("============loaded shelter_index===========")
+    return shelter_dict
