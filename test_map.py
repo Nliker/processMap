@@ -6,11 +6,9 @@ import os
 from djMap import get_short_path_by_dijkstra
 import time
 import pickle
+import multiprocessing
+import subprocess
 
-mongo_host = "localhost"  # 또는 컨테이너의 IP 주소
-mongo_port = 27017
-mongo_user = "ssafy"
-mongo_password = "ssafy"
 
 INF = 1e8
 
@@ -71,8 +69,19 @@ def make_short_path(binary_map,gps_mapping_list,walkable_spot_np_list,shelter_id
     print("================tacking path end================")
     print(f"spend time for tacking path : {end_time - start_time:.5f} sec")
 
-    with open(f"path_dir/{shelter_id}.pkl", 'wb') as f:
+    with open(f"{path_dir}/{shelter_id}.pkl", 'wb') as f:
         pickle.dump(result, f)
+
+def make_short_path_wrapper(args):
+    # make_short_path 함수를 호출하는 래퍼 함수
+    # args는 (shelter_id, shelter_info, binary_map, gps_mapping_list, walkable_spot_np_list)의 튜플이다.
+    binary_map, gps_mapping_list, walkable_spot_np_list, shelter_id, shelter_info = args
+    make_short_path(binary_map, gps_mapping_list, walkable_spot_np_list, shelter_id, shelter_info)
+
+def chunks(lst, n):
+    # 리스트를 n 크기의 청크로 나누는 유틸리티 함수
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
 
 if __name__ == "__main__":
     # preparing folder
@@ -138,9 +147,17 @@ if __name__ == "__main__":
     gps_mapping_list=get_coordinate_gps_mapping()
     shelter_dict=get_shelter_index()
 
-    
-    shelter_id="65fd1f64a1c2102da599d059"
-    shelter_info=shelter_dict[shelter_id]
-    print(shelter_info)
 
-    make_short_path(binary_map,gps_mapping_list,walkable_spot_np_list,shelter_id,shelter_info["walkable_start"])
+    batch_size = 2
+    tasks = [(binary_map, gps_mapping_list, walkable_spot_np_list, shelter_id, shelter_info["walkable_start"]) for shelter_id, shelter_info in shelter_dict.items()]
+    task_batches = list(chunks(tasks, batch_size))
+
+    for task_batch in task_batches:
+        with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+            pool.map(make_short_path_wrapper, task_batch)
+
+    # shelter_id="65fd1f64a1c2102da599d059"
+    # shelter_info=shelter_dict[shelter_id]
+    # print(shelter_info)
+
+    # make_short_path(binary_map,gps_mapping_list,walkable_spot_np_list,shelter_id,shelter_info["walkable_start"])
