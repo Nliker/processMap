@@ -36,7 +36,7 @@ def get_short_path_by_dijkstra(map :list[list[int]],start:tuple):
         for i in range(8):
             nx=x_offset[i]+x
             ny=y_offset[i]+y
-            if not is_vaild(map, nx, ny) or (math.dist(start,[nx,ny])>=100):
+            if not is_vaild(map, nx, ny) or (math.dist(start,[nx,ny])>=3000):
                 continue
             
             next_distance=((nx-x)**2+(ny-y)**2)**(1/2)+dist

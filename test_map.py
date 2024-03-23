@@ -125,12 +125,10 @@ if __name__ == "__main__":
                     line_binary_map_stack=binary_map
                 else:
                     line_binary_map_stack=np.concatenate([line_binary_map_stack,binary_map],axis=1)
-            print(line_binary_map_stack.shape)
             if union_binary_map.size==0:
                 union_binary_map=line_binary_map_stack
             else:
                 union_binary_map=np.concatenate((union_binary_map,line_binary_map_stack),axis=0)
-            print(union_binary_map.shape)
         np.savetxt(f"{union_binary_map_dir}/union_binary_map.txt", union_binary_map, fmt='%d', delimiter=' ')
         print("============saved union binary map===========")
 
